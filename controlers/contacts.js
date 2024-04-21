@@ -1,6 +1,5 @@
 const Contact = require("../models/Contact");
 
-// pobranie
 const getAllContacts = async () => {
   try {
     return await Contact.find();
@@ -9,7 +8,6 @@ const getAllContacts = async () => {
   }
 };
 
-// nowy
 const addContact = async (contactData) => {
   try {
     return await Contact.create(contactData);
@@ -18,7 +16,6 @@ const addContact = async (contactData) => {
   }
 };
 
-// Aktualizacja
 const updateContact = async (contactId, newData) => {
   try {
     return await Contact.findByIdAndUpdate(contactId, newData, { new: true });
@@ -27,7 +24,6 @@ const updateContact = async (contactId, newData) => {
   }
 };
 
-// Usuwanie
 const deleteContact = async (contactId) => {
   try {
     return await Contact.findByIdAndDelete(contactId);
