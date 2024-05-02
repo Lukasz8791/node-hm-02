@@ -1,26 +1,64 @@
 const express = require("express");
-const logger = require("morgan");
-const cors = require("cors");
-
-const contactsRouter = require("./routes/api/contacts");
+const connectDB = require("./db");
+const {
+  getAllContacts,
+  addContact,
+  updateContact,
+  deleteContact,
+} = require("./controlers/contacts");
 
 const app = express();
 
-const formatsLogger = app.get("env") === "development" ? "dev" : "short";
+connectDB();
 
-app.use(logger(formatsLogger));
-app.use(cors());
 app.use(express.json());
 
-app.use("/api/contacts", contactsRouter);
-
-app.use((req, res) => {
-  res.status(404).json({ message: "Not found" });
+app.get("/api/contacts", async (req, res) => {
+  try {
+    const contacts = await getAllContacts();
+    res.json(contacts);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
 });
 
-app.use((err, req, res, next) => {
-  res.status(500).json({ message: err.message });
+app.post("/api/contacts", async (req, res) => {
+  try {
+    const newContact = await addContact(req.body);
+    res.status(201).json(newContact);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
 });
 
-module.exports = app;
-//123
+app.patch("/api/contacts/:contactId", async (req, res) => {
+  const { contactId } = req.params;
+  try {
+    const updatedContact = await updateContact(contactId, req.body);
+    if (!updatedContact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+    res.json(updatedContact);
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+app.delete("/api/contacts/:contactId", async (req, res) => {
+  const { contactId } = req.params;
+  try {
+    const deletedContact = await deleteContact(contactId);
+    if (!deletedContact) {
+      return res.status(404).json({ message: "Contact not found" });
+    }
+    res.json({ message: "Contact deleted successfully" });
+  } catch (error) {
+    res.status(400).json({ message: error.message });
+  }
+});
+
+const PORT = process.env.PORT || 3000;
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${PORT}`);
+});
