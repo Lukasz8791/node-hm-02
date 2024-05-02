@@ -1,8 +1,8 @@
 const Contact = require("../models/Contact");
 
-const getAllContacts = async () => {
+const getAllContacts = async (userId) => {
   try {
-    return await Contact.find();
+    return await Contact.find({ owner: userId });
   } catch (error) {
     throw new Error("Error getting contacts from database");
   }
