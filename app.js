@@ -16,7 +16,7 @@ const app = express();
 connectDB();
 
 app.use(express.json());
-app.use(express.static("public"));
+app.use("/api/users", userRoutes);
 
 app.get("/api/contacts", async (req, res) => {
   try {

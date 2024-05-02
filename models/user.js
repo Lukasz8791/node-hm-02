@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const gravatar = require("gravatar");
 
 const userSchema = new mongoose.Schema({
   password: {
@@ -20,9 +21,17 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
   owner: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type: Schema.Types.ObjectId,
+    ref: "user",
   },
+  avatarURL: String,
+});
+
+userSchema.pre("save", function (next) {
+  if (!this.avatarURL) {
+    this.avatarURL = gravatar.url(this.email, { s: "200", d: "identicon" });
+  }
+  next();
 });
 
 const User = mongoose.model("User", userSchema);
