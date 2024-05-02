@@ -21,7 +21,7 @@ const userSchema = new mongoose.Schema({
     default: null,
   },
   owner: {
-    type: Schema.Types.ObjectId,
+    type: mongoose.Schema.Types.ObjectId,
     ref: "user",
   },
   avatarURL: String,
