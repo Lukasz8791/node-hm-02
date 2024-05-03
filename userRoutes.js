@@ -6,6 +6,7 @@ const sharp = require("sharp");
 const fs = require("fs");
 const User = require("../models/user");
 const authMiddleware = require("../middleware/authMiddleware");
+const path = require("path");
 
 const upload = multer({ dest: "tmp/" });
 const bcrypt = require("bcryptjs");
@@ -89,7 +90,8 @@ router.patch(
         .resize({ width: 250, height: 250 })
         .toBuffer();
 
-      const avatarName = `${req.user._id.toString()}_${Date.now()}.jpg`;
+      const fileExtension = path.extname(req.file.originalname);
+      const avatarName = `${req.user._id.toString()}_${Date.now()}${fileExtension}`;
 
       const avatarPath = `public/avatars/${avatarName}`;
 
