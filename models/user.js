@@ -1,5 +1,4 @@
 const mongoose = require("mongoose");
-const gravatar = require("gravatar");
 
 const userSchema = new mongoose.Schema({
   password: {
@@ -25,6 +24,14 @@ const userSchema = new mongoose.Schema({
     ref: "user",
   },
   avatarURL: String,
+  verify: {
+    type: Boolean,
+    default: false,
+  },
+  verificationToken: {
+    type: String,
+    required: [true, "Verification token is required"],
+  },
 });
 
 userSchema.pre("save", function (next) {
