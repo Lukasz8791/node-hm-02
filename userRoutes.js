@@ -108,4 +108,46 @@ router.post("/register", async (req, res) => {
   }
 });
 
+router.get("/verify/:verificationToken", async (req, res) => {
+  const { verificationToken } = req.params;
+  try {
+    const user = await User.findOneAndUpdate(
+      { verificationToken },
+      { $set: { verify: true, verificationToken: null } },
+      { new: true }
+    );
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    return res.status(200).json({ message: "Verification successful" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
+router.post("/resend-verification-email", async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+    if (user.verify) {
+      return res
+        .status(400)
+        .json({ message: "Verification has already been passed" });
+    }
+    const verificationToken = uuidv4();
+    user.verificationToken = verificationToken;
+    await user.save();
+    const verificationText = `Click the following link to verify your email: ${process.env.APP_URL}/verify/${verificationToken}`;
+    await sendEmail(email, "Verify your email", verificationText);
+    return res.status(200).json({ message: "Verification email sent" });
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ message: "Server error" });
+  }
+});
+
 module.exports = router;
